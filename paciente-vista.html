@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Tratamiento | ADHERENCIA 360</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="pac-header">
+    <div class="pac-header-top">
+      <div class="pac-logo">
+        <i class="fa-solid fa-shield-heart"></i>
+        <span>ADHERENCIA <em>360</em></span>
+      </div>
+      <button class="btn-logout" onclick="cerrarSesion()">
+        <i class="fa-solid fa-right-from-bracket"></i> Salir
+      </button>
+    </div>
+    <div class="pac-greeting">
+      <p id="saludo">Buenos días</p>
+      <h1 id="pacNombreHeader">Paciente</h1>
+      <div class="adh-ring-wrap">
+        <div class="adh-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/>
+            <circle id="ringCircle" cx="50" cy="50" r="42" fill="none" stroke="#10b981" stroke-width="10"
+              stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round"
+              transform="rotate(-90 50 50)" style="transition:stroke-dashoffset 1.2s ease"/>
+          </svg>
+          <div class="adh-ring-label">
+            <strong id="ringPct">0%</strong>
+            <span>adherencia</span>
+          </div>
+        </div>
+        <div class="adh-text">
+          <strong id="adhMensaje">Calculando...</strong>
+          <p id="adhDetalle">Cargando tu información</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <nav class="pac-nav">
+    <button class="pac-tab active" onclick="cambiarTab('hoy',this)">
+      <i class="fa-solid fa-pills"></i> Hoy
+    </button>
+    <button class="pac-tab" onclick="cambiarTab('historial',this)">
+      <i class="fa-solid fa-calendar-check"></i> Historial
+    </button>
+    <button class="pac-tab" onclick="cambiarTab('alertas',this)">
+      <i class="fa-solid fa-bell"></i> Alertas
+    </button>
+    <button class="pac-tab" onclick="cambiarTab('perfil',this)">
+      <i class="fa-solid fa-user"></i> Perfil
+    </button>
+  </nav>
+
+  <!-- BODY -->
+  <div class="pac-body">
+
+    <!-- TAB: HOY -->
+    <div class="pac-section active" id="tab-hoy">
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-sun"></i> Medicamentos de hoy</div>
+        <div class="pac-card-body" id="medsHoy">
+          <div class="empty-state"><i class="fa-solid fa-pills"></i>Sin medicamentos asignados.<br>Consulta con tu médico.</div>
+        </div>
+      </div>
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-chart-line"></i> Progreso semanal</div>
+        <div class="pac-card-body" id="progresoSemanal">
+          <div class="prog-row">
+            <span class="prog-label">Esta semana</span>
+            <div class="prog-track"><div class="prog-fill" id="progSem" style="width:0%;background:#10b981"></div></div>
+            <span class="prog-pct" id="progSemPct">0%</span>
+          </div>
+          <div class="prog-row">
+            <span class="prog-label">Este mes</span>
+            <div class="prog-track"><div class="prog-fill" id="progMes" style="width:0%;background:#3b82f6"></div></div>
+            <span class="prog-pct" id="progMesPct">0%</span>
+          </div>
+          <div class="prog-row">
+            <span class="prog-label">General</span>
+            <div class="prog-track"><div class="prog-fill" id="progGen" style="width:0%;background:#8b5cf6"></div></div>
+            <span class="prog-pct" id="progGenPct">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: HISTORIAL -->
+    <div class="pac-section" id="tab-historial">
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-calendar-week"></i> Últimos 21 días</div>
+        <div class="pac-card-body">
+          <div class="hist-grid" id="histGrid"></div>
+          <div class="hist-legend">
+            <span><span class="dot" style="background:#10b981"></span> Tomado</span>
+            <span><span class="dot" style="background:#ef4444"></span> Omitido</span>
+            <span><span class="dot" style="background:#e2e8f0"></span> Sin datos</span>
+          </div>
+        </div>
+      </div>
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-list-check"></i> Registro detallado</div>
+        <div class="pac-card-body" id="registroDetallado">
+          <p style="font-size:.85rem;color:var(--text-sub)">Aquí aparecerán las confirmaciones que hayas registrado.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ALERTAS -->
+    <div class="pac-section" id="tab-alertas">
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-bell"></i> Notificaciones y avisos</div>
+        <div class="pac-card-body" id="alertasPaciente">
+          <div class="empty-state"><i class="fa-solid fa-check-circle" style="color:#10b981;opacity:1"></i>Sin alertas pendientes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PERFIL -->
+    <div class="pac-section" id="tab-perfil">
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-user"></i> Mi información</div>
+        <div class="pac-card-body">
+          <div class="perfil-avatar" id="perfilAvatar">?</div>
+          <div class="perfil-name" id="perfilNombre">—</div>
+          <div class="perfil-sub" id="perfilEnfermedad">—</div>
+          <div id="perfilItems"></div>
+        </div>
+      </div>
+      <div class="pac-card">
+        <div class="pac-card-title"><i class="fa-solid fa-pills"></i> Mis tratamientos activos</div>
+        <div class="pac-card-body" id="perfilTrats"></div>
+      </div>
+      <button class="btn-logout" style="width:100%;justify-content:center;padding:13px;border-radius:12px;background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-size:.9rem;font-weight:600;" onclick="cerrarSesion()">
+        <i class="fa-solid fa-right-from-bracket" style="color:var(--red)"></i> Cerrar Sesión
+      </button>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Verificar sesión
+    const sesion = JSON.parse(sessionStorage.getItem('sesion360') || 'null');
+    if (!sesion || sesion.rol !== 'paciente') {
+      window.location.href = 'login.html';
+    }
+
+    const pacId = sesion ? sesion.id : null;
+    const pacs = JSON.parse(localStorage.getItem('pacientes360') || '[]');
+    const trats = JSON.parse(localStorage.getItem('tratamientos360') || '[]');
+    const pac = pacs.find(p => p.id === pacId) || {};
+    const misTraTs = trats.filter(t => t.pacienteId === pacId);
+
+    // --- HEADER ---
+    const hora = new Date().getHours();
+    document.getElementById('saludo').textContent =
+      hora < 12 ? 'Buenos días 🌤️' : hora < 18 ? 'Buenas tardes ☀️' : 'Buenas noches 🌙';
+    document.getElementById('pacNombreHeader').textContent = pac.nombre || 'Paciente';
+
+    // Anillo de adherencia
+    const adh = pac.adherencia || 0;
+    setTimeout(() => {
+      const offset = 264 - (264 * adh / 100);
+      document.getElementById('ringCircle').style.strokeDashoffset = offset;
+      document.getElementById('ringCircle').style.stroke = adh >= 80 ? '#10b981' : adh >= 60 ? '#f59e0b' : '#ef4444';
+    }, 300);
+    document.getElementById('ringPct').textContent = adh + '%';
+
+    const adhMsg = adh >= 80 ? '¡Excelente adherencia!' : adh >= 60 ? 'Adherencia regular' : 'Adherencia baja';
+    const adhDet = adh >= 80 ? 'Sigue así, tu salud mejora' : adh >= 60 ? 'Intenta no omitir dosis' : 'Contacta a tu médico';
+    document.getElementById('adhMensaje').textContent = adhMsg;
+    document.getElementById('adhDetalle').textContent = adhDet;
+
+    // --- TAB HOY ---
+    function renderHoy() {
+      const el = document.getElementById('medsHoy');
+      if (misTraTs.length === 0) return;
+
+      const confirmados = JSON.parse(localStorage.getItem('confirmados360_' + pacId) || '{}');
+      const hoy = new Date().toISOString().split('T')[0];
+
+      el.innerHTML = misTraTs.map((t, i) => {
+        const key = hoy + '_' + t.id;
+        const done = !!confirmados[key];
+        const colores = ['#eff6ff|#2563eb', '#f0fdf4|#10b981', '#faf5ff|#8b5cf6', '#fff7ed|#f59e0b'];
+        const [bg, fg] = colores[i % colores.length].split('|');
+        const horarios = t.horario.split(',').map(h => h.trim());
+
+        return `<div class="med-item" id="med-${t.id}">
+          <div class="med-icon" style="background:${bg};color:${fg}">
+            <i class="fa-solid fa-pills"></i>
+          </div>
+          <div class="med-info">
+            <strong>${t.med}</strong>
+            <span><i class="fa-solid fa-clock"></i> ${t.horario}</span>
+            <span><i class="fa-solid fa-scale-balanced"></i> ${t.dosis}</span>
+          </div>
+          <div class="med-action">
+            ${done
+              ? `<button class="btn-confirm done"><i class="fa-solid fa-check"></i> Tomado</button>`
+              : `<button class="btn-confirm" onclick="confirmarMed(${t.id},'${key}')">
+                  <i class="fa-solid fa-check"></i> Confirmar
+                </button>`
+            }
+          </div>
+        </div>`;
+      }).join('');
+
+      // Progreso
+      const total = misTraTs.length;
+      const confirmadosHoy = Object.keys(confirmados).filter(k => k.startsWith(hoy)).length;
+      const pctHoy = total ? Math.round(confirmadosHoy / total * 100) : 0;
+      document.getElementById('progSem').style.width = pctHoy + '%';
+      document.getElementById('progSemPct').textContent = pctHoy + '%';
+      document.getElementById('progMes').style.width = adh + '%';
+      document.getElementById('progMesPct').textContent = adh + '%';
+      document.getElementById('progGen').style.width = adh + '%';
+      document.getElementById('progGenPct').textContent = adh + '%';
+    }
+    renderHoy();
+
+    function confirmarMed(tratId, key) {
+      const confirmados = JSON.parse(localStorage.getItem('confirmados360_' + pacId) || '{}');
+      confirmados[key] = new Date().toISOString();
+      localStorage.setItem('confirmados360_' + pacId, JSON.stringify(confirmados));
+
+      // Actualizar adherencia
+      const idx = pacs.findIndex(p => p.id === pacId);
+      if (idx !== -1) {
+        pacs[idx].adherencia = Math.min(100, (pacs[idx].adherencia || 0) + 2);
+        localStorage.setItem('pacientes360', JSON.stringify(pacs));
+      }
+
+      const btn = document.querySelector(`#med-${tratId} .btn-confirm`);
+      if (btn) { btn.className = 'btn-confirm done'; btn.innerHTML = '<i class="fa-solid fa-check"></i> Tomado'; btn.disabled = true; }
+      mostrarToastPac('✅ ¡Dosis confirmada! Buen trabajo.');
+    }
+    window.confirmarMed = confirmarMed;
+
+    // --- TAB HISTORIAL ---
+    function renderHistorial() {
+      const grid = document.getElementById('histGrid');
+      const confirmados = JSON.parse(localStorage.getItem('confirmados360_' + pacId) || '{}');
+      const dias = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+      let html = '';
+      for (let i = 20; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        const hay = Object.keys(confirmados).some(k => k.startsWith(key));
+        const esHoy = i === 0;
+        const cls = esHoy && !hay ? 'na' : hay ? 'ok' : (i < 7 ? 'fail' : 'na');
+        html += `<div class="hist-day ${cls}">${dias[d.getDay()]}<br>${d.getDate()}</div>`;
+      }
+      grid.innerHTML = html;
+    }
+    renderHistorial();
+
+    // --- TAB ALERTAS ---
+    function renderAlertas() {
+      const el = document.getElementById('alertasPaciente');
+      const alertas = [];
+
+      if (adh < 60) alertas.push({ tipo:'warn', icon:'fa-triangle-exclamation', titulo:'Adherencia baja', msg:'Tu adherencia es del ' + adh + '%. Consulta con tu médico.' });
+      if (misTraTs.length === 0) alertas.push({ tipo:'info', icon:'fa-circle-info', titulo:'Sin tratamientos asignados', msg:'Espera a que tu médico te asigne medicamentos.' });
+      else alertas.push({ tipo:'good', icon:'fa-circle-check', titulo:'Tratamientos activos', msg:'Tienes ' + misTraTs.length + ' medicamento(s) programado(s).' });
+      alertas.push({ tipo:'info', icon:'fa-whatsapp fab', titulo:'Recordatorios WhatsApp', msg:'Recibirás recordatorios automáticos en tu celular registrado.' });
+
+      el.innerHTML = alertas.map(a =>
+        `<div class="alert-pac ${a.tipo}">
+          <i class="${a.icon}"></i>
+          <div><strong>${a.titulo}</strong><span>${a.msg}</span></div>
+        </div>`
+      ).join('');
+    }
+    renderAlertas();
+
+    // --- TAB PERFIL ---
+    function renderPerfil() {
+      const initials = (pac.nombre || 'P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('perfilAvatar').textContent = initials;
+      document.getElementById('perfilNombre').textContent = pac.nombre || '—';
+      document.getElementById('perfilEnfermedad').textContent = pac.enfermedad || '—';
+
+      const estadoBadge = adh >= 80 ? '<span class="badge-sm badge-green">Activo</span>' :
+                          adh >= 60 ? '<span class="badge-sm badge-amber">Irregular</span>' :
+                                      '<span class="badge-sm badge-red">En Riesgo</span>';
+      document.getElementById('perfilItems').innerHTML = `
+        <div class="perfil-item"><i class="fa-solid fa-phone"></i><div><strong>Celular (WhatsApp)</strong><span>${pac.celular || '—'}</span></div></div>
+        <div class="perfil-item"><i class="fa-solid fa-heart-pulse"></i><div><strong>Enfermedad base</strong><span>${pac.enfermedad || '—'}</span></div></div>
+        <div class="perfil-item"><i class="fa-solid fa-chart-line"></i><div><strong>Estado</strong><span>${estadoBadge}</span></div></div>
+        <div class="perfil-item"><i class="fa-solid fa-percent"></i><div><strong>Adherencia actual</strong><span style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800">${adh}%</span></div></div>
+      `;
+
+      document.getElementById('perfilTrats').innerHTML = misTraTs.length
+        ? misTraTs.map(t => `
+          <div class="med-item">
+            <div class="med-icon" style="background:#eff6ff;color:#2563eb"><i class="fa-solid fa-pills"></i></div>
+            <div class="med-info">
+              <strong>${t.med}</strong>
+              <span><i class="fa-solid fa-clock"></i> ${t.horario}</span>
+              <span><i class="fa-solid fa-scale-balanced"></i> ${t.dosis}</span>
+            </div>
+            <span class="badge-sm badge-green">Activo</span>
+          </div>`).join('')
+        : '<div class="empty-state"><i class="fa-solid fa-pills"></i>Sin tratamientos asignados</div>';
+    }
+    renderPerfil();
+
+    // --- UTILS ---
+    function cambiarTab(id, btn) {
+      document.querySelectorAll('.pac-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.pac-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+    window.cambiarTab = cambiarTab;
+
+    function cerrarSesion() {
+      sessionStorage.removeItem('sesion360');
+      window.location.href = 'login.html';
+    }
+    window.cerrarSesion = cerrarSesion;
+
+    function mostrarToastPac(msg) {
+      let t = document.getElementById('toastPac');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toastPac';
+        t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#10b981;color:#fff;padding:12px 20px;border-radius:10px;font-weight:600;font-size:.88rem;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:.35s;opacity:0;white-space:nowrap;z-index:9999';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(0)'; t.style.opacity = '1'; }, 10);
+      setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; t.style.opacity = '0'; }, 3000);
+    }
+  </script>
+</body>
+</html>
